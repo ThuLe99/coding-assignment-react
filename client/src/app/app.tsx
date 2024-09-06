@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Ticket, User } from '@acme/shared-models';
 
-import styles from './app.module.css';
-import Tickets from './tickets/tickets';
+import "./styles/global.scss";
 
+import TicketsPage from './pages/tickets/tickets';
+
+import "./styles/global.scss"
+import TicketPage from './pages/ticket/ticket';
 const App = () => {
   const [tickets, setTickets] = useState([] as Ticket[]);
   const [users, setUsers] = useState([] as User[]);
@@ -27,14 +30,14 @@ const App = () => {
   }, []);
 
   return (
-    <div className={styles['app']}>
+    <div className='contentContainer'>
       <h1>Ticketing App</h1>
-      <Routes>
-        <Route path="/" element={<Tickets tickets={tickets} />} />
-        {/* Hint: Try `npx nx g component TicketDetails --project=client --no-export` to generate this component  */}
-        <Route path="/:id" element={<h2>Details Not Implemented</h2>} />
-      </Routes>
-    </div>
+        <Routes>
+          <Route path="/" element={<TicketsPage></TicketsPage>} />
+          {/* Hint: Try `npx nx g component TicketDetails --project=client --no-export` to generate this component  */}
+          <Route path="/:id" element={<TicketPage></TicketPage>} />
+        </Routes>
+      </div>
   );
 };
 

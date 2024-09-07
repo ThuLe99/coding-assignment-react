@@ -1,6 +1,7 @@
 @import "../../styles/variables.scss";
 
 .add {
+  z-index:10;
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -20,7 +21,7 @@
     h1 {
       margin-bottom: 40px;
       font-size: 24px;
-      color: $soft-color;
+      color: $dark-color;
     }
 
     .close {
@@ -37,7 +38,7 @@
       justify-content: space-between;
 
       .item {
-        width: 40%;
+        width: 100%;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -50,13 +51,16 @@
         input {
           padding: 10px;
           background-color: transparent;
-          color: white;
-          outline: none;
+          color: $dark-color;
           border: 1px solid $soft-color;
           border-radius: 3px;
         }
       }
+      .ckbBtn {
+        margin-left: 5px;
+      }
       button {
+        margin-top: 20px;
         width: 100%;
         padding: 10px;
         cursor: pointer;

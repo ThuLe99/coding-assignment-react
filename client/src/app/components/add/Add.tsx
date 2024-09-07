@@ -1,6 +1,11 @@
+import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+
 import { GridColDef } from "@mui/x-data-grid";
 import "./add.scss";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { Ticket } from "@acme/shared-models";
+import * as ticketAPI from './../../../api/ticketAPI'
 
 type Props = {
   slug: string;
@@ -9,42 +14,27 @@ type Props = {
 };
 
 const Add = (props: Props) => {
+  const [ticket, setTicket] = useState<Ticket>({
+    id: 0,
+    description: '',
+    assigneeId: 0,
+    completed: false,
+  })
 
-  // TEST THE API
+  const dispatch = useDispatch()
 
-  // const queryClient = useQueryClient();
-
-  // const mutation = useMutation({
-  //   mutationFn: () => {
-  //     return fetch(`http://localhost:8800/api/${props.slug}s`, {
-  //       method: "post",
-  //       headers: {
-  //         Accept: "application/json",
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         id: 111,
-  //         img: "",
-  //         lastName: "Hello",
-  //         firstName: "Test",
-  //         email: "testme@gmail.com",
-  //         phone: "123 456 789",
-  //         createdAt: "01.02.2023",
-  //         verified: true,
-  //       }),
-  //     });
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries([`all${props.slug}s`]);
-  //   },
-  // });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch({ type: 'tickets/create_request' })
 
-    //add new item
-    // mutation.mutate();
-    props.setOpen(false)
+    try {
+      const data = await ticketAPI.createTicket({ ...ticket, assigneeId: Number(ticket.assigneeId) })
+      dispatch({ type: 'tickets/create_success', payload: data })
+
+    } catch (error) {
+      dispatch({ type: 'tickets/create_error', payload: error })
+    }
+
   };
   return (
     <div className="add">
@@ -52,17 +42,20 @@ const Add = (props: Props) => {
         <span className="close" onClick={() => props.setOpen(false)}>
           X
         </span>
-        <h1>Add new {props.slug}</h1>
+        <h1>Add new ticket</h1>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img")
+            .filter((item) => item.field !== "completed")
             .map((column) => (
-              <div className="item">
+              <div className="item" key={column.headerName}>
                 <label>{column.headerName}</label>
-                <input type={column.type} placeholder={column.field} />
+                <input type={column.type} placeholder={column.field}
+                  onChange={(e: { target: { value: any; }; }) => setTicket({ ...ticket, [column.field]: e.target.value })} />
               </div>
             ))}
-          <button>Send</button>
+
+          <label>Status<input type="checkbox" className="ckbBtn" onChange={e => setTicket({ ...ticket, completed: e.target.checked })}></input></label>
+          <button className="userUpdateButton">Send</button>
         </form>
       </div>
     </div>

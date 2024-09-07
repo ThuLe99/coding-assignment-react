@@ -1,5 +1,6 @@
 /* eslint-disable */
 export default {
+  roots:['<rootDir>/src'],
   displayName: 'client',
   preset: '../jest.preset.js',
   transform: {
@@ -12,4 +13,5 @@ export default {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../coverage/apps/react-client',
   setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
+  verbose: true
 };

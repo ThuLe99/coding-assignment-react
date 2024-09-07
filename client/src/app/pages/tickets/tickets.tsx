@@ -1,32 +1,42 @@
-import { GridColDef } from "@mui/x-data-grid";
-import DataTable from "../../components/dataTable/DataTable";
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from "react";
+
 import "./tickets.scss";
-import { useContext, useEffect, useState } from "react";
+
+import { GridColDef } from "@mui/x-data-grid";
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+
+
+import DataTable from "../../components/dataTable/DataTable";
 import Add from "../../components/add/Add"
-import TicketsContext from "../../context";
-import { Ticket } from "@acme/shared-models";
-// import { useQuery } from "@tanstack/react-query";
+import Spinner from "../../components/common/Spinner";
+
+
+import { User } from "@acme/shared-models";
+import * as ticketAPI from './../../../api/ticketAPI'
 
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 190 },
+  { field: "id", headerName: "ID", width: 90 },
   {
     field: "description",
     type: "string",
     headerName: "Description",
-    width: 400,
+    flex: 2
   },
   {
     field: "assigneeId",
-    type: "string",
+    type: 'number',
     headerName: "Assignee",
-    width: 200,
+    flex: 0.5
+
   },
   {
     field: "completed",
     type: "string",
     headerName: "Status",
-    width: 200,
+    flex: 0.5
   },
 
 ];
@@ -34,33 +44,38 @@ const columns: GridColDef[] = [
 
 const TicketsPage = () => {
   const [open, setOpen] = useState(false);
-  const [tickets, setTickets] = useState<Ticket[]>([])
-  console.log("🚀 ~ TicketsPage ~ tickets:", tickets)
+  const [users, setUsers] = useState<User[]>([])
+
+  const {
+    data: tickets, loading, error
+  } = useSelector((state: any) => state.ticketState)
+
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    async function fetchTickets() {
-      const data = await fetch('/api/tickets').then();
-      setTickets(await data.json());
-    }
-    fetchTickets()
-  }, [])
+    dispatch({ type: `tickets/fetch_request` })
 
+    ticketAPI.getTickets()
+      .then(data => {
+        dispatch({ type: 'tickets/fetch_success', payload: data })
+      })
+      .catch(err => {
+        dispatch({ type: 'tickets/fetch_error', payload: err })
+      })
+  }, [dispatch])
 
   return (
     <div className="users">
       <div className="info">
         <h1>Tickets</h1>
-        <button onClick={() => setOpen(true)}>Add New User</button>
+        <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
+          Add New Ticket
+        </Button>
       </div>
       <DataTable slug="tickets" columns={columns} rows={tickets} />
-      {/* TEST THE API */}
-
-      {/* {isLoading ? (
-        "Loading..."
-      ) : (
-        <DataTable slug="users" columns={columns} rows={data} />
-      )} */}
       {open && <Add slug="user" columns={columns} setOpen={setOpen} />}
+      {loading && <Spinner />}
     </div>
   );
 };
